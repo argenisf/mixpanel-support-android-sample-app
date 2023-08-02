@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Mixpanel Support Android Sample App</string>
+    <string name="loginEmailLabel">Email address</string>
+    <string name="loginEmailHint">Enter your email</string>
+</resources>
