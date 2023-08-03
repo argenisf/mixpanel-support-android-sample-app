@@ -18,15 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ProfileData extends AppCompatActivity {
-
-    EditText nameInput;
-    TextView emailLabel;
-    Button btnLogOut;
-    Button btnSave;
-    Context context;
-    JSONObject user;
-    StorageHelper helper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +26,35 @@ public class ProfileData extends AppCompatActivity {
         helper = new StorageHelper(context);
         Intent intent = getIntent();
         user = helper.getUserData(intent.getStringExtra("userEmail"));
+        setupUI(user);
+    }//end of onCreate
 
+    /*
+     * Void function; executed in the profile data screen
+     * Updates the user's name into local storage via the StorageHelper class
+     * @param name User's name
+     */
+    private void doNameUpdate(String name){
+        if(name == "") return;
+        try {
+            user.put("name",name);
+            helper.storeUserData(user);
+            //TODO: track user updated name
+        } catch (JSONException e) {
+            Log.v("ProfileData","Issues updating user object");
+        }
+        Toast.makeText(context,"User's name updated", Toast.LENGTH_SHORT).show();
+    }//end of doNameUpdate
+
+    /*
+     * Void function; logs the user out and returns to the launcher screen
+     */
+    private void doLogOut(){
+        //TODO: track logout
+        finish();
+    }//end of doLogOut
+
+    private void setupUI(JSONObject user){
         emailLabel = (TextView) findViewById(R.id.labelEmailValue);
         nameInput = (EditText) findViewById(R.id.inputName);
         btnLogOut = (Button) findViewById(R.id.btnLogOut);
@@ -51,7 +70,7 @@ public class ProfileData extends AppCompatActivity {
         btnLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                doLogOut();
             }
         });
         nameInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -70,19 +89,13 @@ public class ProfileData extends AppCompatActivity {
                 doNameUpdate(nameInput.getText().toString());
             }
         });
+    }//end of setupUI
 
-
-
-    }//end of onCreate
-
-    private void doNameUpdate(String name){
-        if(name == "") return;
-        try {
-            user.put("name",name);
-            helper.storeUserData(user);
-        } catch (JSONException e) {
-            Log.v("ProfileData","Issues updating user object");
-        }
-        Toast.makeText(context,"User's name updated", Toast.LENGTH_SHORT).show();
-    }
+    EditText nameInput;
+    TextView emailLabel;
+    Button btnLogOut;
+    Button btnSave;
+    Context context;
+    JSONObject user;
+    StorageHelper helper;
 }//end of activity
