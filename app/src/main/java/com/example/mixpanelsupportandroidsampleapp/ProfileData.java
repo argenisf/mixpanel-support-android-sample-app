@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,6 +29,8 @@ public class ProfileData extends AppCompatActivity {
         Intent intent = getIntent();
         user = helper.getUserData(intent.getStringExtra("userEmail"));
         setupUI(user);
+
+        mixpanel = MixpanelAPI.getInstance(context,MainActivity.MP_PROJECT_TOKEN, false);
     }//end of onCreate
 
     /*
@@ -39,7 +43,11 @@ public class ProfileData extends AppCompatActivity {
         try {
             user.put("name",name);
             helper.storeUserData(user);
-            //TODO: track user updated name
+
+            mixpanel.track("user_updated_name");
+            mixpanel.getPeople().set("$name",name);
+            mixpanel.flush();
+
         } catch (JSONException e) {
             Log.v("ProfileData","Issues updating user object");
         }
@@ -50,7 +58,10 @@ public class ProfileData extends AppCompatActivity {
      * Void function; logs the user out and returns to the launcher screen
      */
     private void doLogOut(){
-        //TODO: track logout
+        mixpanel.track("log_out");
+        mixpanel.flush();
+        //reset to generate a new ID for the potential next user
+        mixpanel.reset();
         finish();
     }//end of doLogOut
 
@@ -98,4 +109,5 @@ public class ProfileData extends AppCompatActivity {
     Context context;
     JSONObject user;
     StorageHelper helper;
+    MixpanelAPI mixpanel;
 }//end of activity

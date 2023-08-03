@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
+
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,13 +26,13 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         helper = new StorageHelper(context);
         setupUI();
-        //TODO: initialize analytics
+        mixpanel = MixpanelAPI.getInstance(context,MP_PROJECT_TOKEN, false);
     }//end of onCreate
 
     @Override
     protected void onResume() {
         super.onResume();
-        //TODO: track when the app is opened
+        mixpanel.track("app_open");
     }//end of onResume
 
     /*
@@ -44,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
         JSONObject user = helper.getUserData(emailValue);
         emailInput.setText("");
 
-        //TODO: track user authenticated
+        mixpanel.identify(emailValue, true);
+        mixpanel.track("user_authenticated");
+        mixpanel.getPeople().set("$email", emailValue);
 
         Intent intent = new Intent(context, ProfileData.class);
         intent.putExtra("userEmail",emailValue);
@@ -77,4 +81,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText emailInput;
     private Button loginBtn;
     private Context context;
+    public static String MP_PROJECT_TOKEN = "YOURPROJECTTOKEN";
+    private MixpanelAPI mixpanel;
 }//end of MainActivity
